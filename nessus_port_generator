@@ -1,0 +1,40 @@
+#!/bin/bash
+
+echo "Enter File Path"
+read path
+
+cd $path
+list=`ls | wc -l`
+echo "IP Address@Port Number@TCP / UDP" > port_report
+
+for (( m=1 ; m <= $list ; m++ ))
+do
+	file=`ls | sed -n ''$m'p'`
+	cat $file | grep "</h2>" --line-number | grep -e "classsection\|classsubsection" | cut -d "<" -f2 | cut -d ">" -f2 > temp_out
+
+	c=`wc -l temp_out | cut -d " " -f1`
+
+	for (( i=1 ; i < $c ; i++ ))
+	do
+		a=`cat temp_out | sed -n ''$i'p' | grep -Po "\d+\.\d+\.\d+\.\d+" | wc -l`
+	
+		if [ "$a" == "1" ]
+		then
+			ip=`cat temp_out | sed -n ''$i'p' | grep -Po "\d+\.\d+\.\d+\.\d+"`
+			continue
+		else
+			val1=`cat temp_out | sed -n ''$i'p' | cut -d "/" -f1`
+			if [ "$val1" != "0" ]
+			then
+				val2=`cat temp_out | sed -n ''$i'p' | cut -d "/" -f2`
+				echo "$ip@$val1@$val2" >> port_report
+			fi
+		fi
+	done
+done
+
+sort -u port_report > port_report_final
+rm temp_out
+rm port_report
+tac port_report_final > port_report
+rm port_report_final
