@@ -7,4 +7,5 @@ Place list of HTML Nessus Report in a folder
 Go to the script location
 
 ./nessus_port_generator
+
 [provide full path of the folder]
